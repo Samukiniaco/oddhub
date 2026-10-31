@@ -11,6 +11,9 @@ consoles portáteis via PortMaster, compartilhando um núcleo (`core/`).
 - Núcleo compartilhado: `core/`
 - Ports: `ports/` (um por app + `oddhub` gerenciador)
 - Acompanhamento: `PORTS.md`
+- Gerenciador GUI: `tools/port_manager.py` (lista e edita apps)
+- Rastreamento rápido: `tools/tracker.py`
+- Notas de pesquisa: `NOTES.md` + `tools/note.py`
 - Arquitetura: `docs/architecture.md`
 
 Repositório: https://github.com/Samukiniaco/oddhub.git

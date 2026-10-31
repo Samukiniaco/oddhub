@@ -89,6 +89,25 @@ class Item:
 - Versionamento por port (campo `version` no port.json) e changelog por app.
 - O hub pode consultar a API do GitHub para listar releases e baixar zips.
 
+## Gerenciador GUI (port_manager.py)
+
+Para facilitar a manutenção diária, a coletânea inclui um **GUI simples** que
+lista os ports (`ports/registry.json`) e permite:
+
+- Selecionar um app e alterar seu **status** (planejado / em andamento / protótipo /
+  funcional / pausado).
+- Abrir um editor de notas para adicionar/editar observações que são salvas em
+  `NOTES.md`.
+- Salvar todas as alterações no `registry.json` e `NOTES.md`.
+
+Executar:
+
+```bash
+python tools/port_manager.py
+```
+
+Como alternativa, `tools/tracker.py` exibe uma lista em modo texto.
+
 ## Dispositivos e geolocalização/mídia
 - Mídia (vídeo/áudio) via processo externo (mpv/ffplay) em tela cheia, pois
   pygame não decodifica formatos comprimidos/DRM.
