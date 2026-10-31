@@ -1,0 +1,15 @@
+{
+  "core": {"status": "em andamento", "notes": "esqueleto, nao pronto para producao"},
+  "oddhub": {"status": "prototipo", "notes": "lista services, UI basica"},
+  "apps": [
+    {"id": "whatsapp", "name": "WhatsApp", "type": "messaging", "approach": "scraping", "status": "planejado"},
+    {"id": "instagram", "name": "Instagram", "type": "social", "approach": "scraping/api", "status": "planejado"},
+    {"id": "pinterest", "name": "Pinterest", "type": "social", "approach": "api", "status": "planejado"},
+    {"id": "google", "name": "Google (busca)", "type": "search", "approach": "api", "status": "planejado"},
+    {"id": "googlemaps", "name": "Google Maps", "type": "maps", "approach": "scraping/geo", "status": "planejado"},
+    {"id": "spotify", "name": "Spotify", "type": "music", "approach": "api+previews", "status": "planejado"},
+    {"id": "youtubemusic", "name": "YouTube Music", "type": "music", "approach": "api+mpv", "status": "planejado"},
+    {"id": "netflix", "name": "Netflix", "type": "streaming", "approach": "metadata+deeplink", "status": "planejado"},
+    {"id": "crunchyroll", "name": "Crunchyroll", "type": "streaming", "approach": "metadata+deeplink", "status": "planejado"}
+  ]
+}

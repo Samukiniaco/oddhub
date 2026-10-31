@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./CaVo.sh</path>
+    <name>CaVo</name>
+    <desc>Battle royale 2D de comedia adulta. Os lutadores sao caralhinhos voadores (T alado). Treino, Versus local e Online.</desc>
+    <releasedate>20261026T000000</releasedate>
+    <developer>Samuka</developer>
+    <publisher>Open Source</publisher>
+    <genre>Action</genre>
+    <image>./cavo/screenshot.png</image>
+  </game>
+</gameList>

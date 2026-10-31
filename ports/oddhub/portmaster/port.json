@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "name": "oddhub.zip",
+  "items": ["OddHub.sh", "oddhub"],
+  "items_opt": [],
+  "attr": {
+    "title": "OddHub",
+    "porter": ["Samuka"],
+    "desc": "Gerenciador da coletanea de ports.",
+    "inst": "Port gerenciador; compartilha o core com os demais ports.",
+    "genres": ["utility"],
+    "image": null,
+    "rtr": false,
+    "exp": false,
+    "runtime": ["python_3.11"],
+    "store": [],
+    "availability": "full",
+    "reqs": [],
+    "arch": ["aarch64"],
+    "min_glibc": ""
+  }
+}

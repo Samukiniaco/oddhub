@@ -1,0 +1,1 @@
+"""Services (apps) incluidos no hub. Importe cada modulo aqui para registrar."""

@@ -1,0 +1,1 @@
+"""Camada de rede: HTTP, cache, auth."""

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./OddHub.sh</path>
+    <name>OddHub</name>
+    <desc>Gerenciador da coletanea de ports.</desc>
+    <developer>Samuka</developer>
+    <publisher>Open Source</publisher>
+    <genre>Utility</genre>
+  </game>
+</gameList>

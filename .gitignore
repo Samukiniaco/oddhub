@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build output
+dist/
+*.zip
+
+# Port runtime/deps pesados
+port de ref/cavo/site-packages/
+port de ref/cavo/deps/
+port de ref/cavo/libs.aarch64/
+port de ref/cavo/cavo/__pycache__/
+**/__pycache__/
+
+# Conf/local
+**/conf/
+*.log
+
+# OS
+Thumbs.db
+.DS_Store

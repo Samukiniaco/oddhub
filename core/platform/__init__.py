@@ -1,0 +1,1 @@
+"""Abstração de dispositivo: display, input, storage, saída."""

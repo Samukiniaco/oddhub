@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "name": "cavo.zip",
+  "items": [
+    "CaVo.sh",
+    "cavo"
+  ],
+  "items_opt": [],
+  "attr": {
+    "title": "CaVo",
+    "porter": [
+      "Samuka"
+    ],
+    "desc": "Battle royale 2D de comedia adulta. Os lutadores sao caralhinhos voadores (T alado). Treino, Versus local e Online (nuvem/relay).",
+    "desc_md": null,
+    "inst": "Port de dados: instale o port e copie os arquivos do jogo (main.py + pasta cavo/) para /roms/ports/cavo/. Requer runtime python_3.11 do PortMaster e pygame-ce para aarch64 (ver README).",
+    "inst_md": null,
+    "genres": [
+      "action",
+      "fighting"
+    ],
+    "image": null,
+    "rtr": false,
+    "exp": false,
+    "runtime": [
+      "python_3.11"
+    ],
+    "store": [],
+    "availability": "full",
+    "reqs": [],
+    "arch": [
+      "aarch64"
+    ],
+    "min_glibc": ""
+  }
+}

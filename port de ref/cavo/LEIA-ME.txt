@@ -1,0 +1,9 @@
+Copie aqui os arquivos do jogo CaVo:
+  - main.py
+  - pasta cavo/ (todos os .py)
+  - (opcional) texts.json, sprites/, sprites/manifest.json
+
+Dependencias (pygame-ce aarch64 + requests) podem ir em site-packages/ (mesma pasta).
+  - No Windows/Linux: python fetch_deps.py
+  - No dispositivo (aarch64): ./fetch_deps.sh
+Conf e saves vao para conf/ automaticamente.

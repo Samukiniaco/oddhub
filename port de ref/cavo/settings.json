@@ -1,0 +1,128 @@
+{
+  "video_mode": "fullscreen",
+  "res_index": 9,
+  "video_version": 2,
+  "quality": "custom",
+  "particles": true,
+  "shake": true,
+  "bg": true,
+  "relay": "ws://localhost:8765",
+  "controls": {
+    "touch_mode": "joystick",
+    "touch_layout": {
+      "aim": [
+        145,
+        495,
+        85
+      ],
+      "jet": [
+        795,
+        460,
+        58
+      ],
+      "flap": [
+        675,
+        555,
+        46
+      ],
+      "action": [
+        815,
+        585,
+        38
+      ],
+      "menu": [
+        50,
+        125,
+        28
+      ]
+    },
+    "keyboard1": {
+      "left": [
+        97
+      ],
+      "right": [
+        100
+      ],
+      "flap": [
+        32,
+        119
+      ],
+      "jet": [
+        115,
+        102
+      ],
+      "action": [
+        1073742049,
+        101
+      ],
+      "menu": [
+        27,
+        109
+      ],
+      "retry": [
+        114
+      ]
+    },
+    "keyboard2": {
+      "left": [
+        1073741904
+      ],
+      "right": [
+        1073741903
+      ],
+      "flap": [
+        1073741906
+      ],
+      "jet": [
+        1073741905
+      ],
+      "action": [
+        1073742053,
+        47
+      ],
+      "menu": [],
+      "retry": []
+    },
+    "gamepad": {
+      "flap": [
+        "b0"
+      ],
+      "jet": [
+        "b5",
+        "rt"
+      ],
+      "action": [
+        "b4"
+      ],
+      "menu": [
+        "b9"
+      ],
+      "retry": [
+        "b3"
+      ],
+      "confirm": [
+        "b0"
+      ],
+      "back": [
+        "b1"
+      ]
+    },
+    "aim_stick": "right",
+    "layout_version": 3
+  },
+  "online_mode": "nuvem",
+  "smooth_scaling": true,
+  "show_fps": true,
+  "debug_stats": false,
+  "show_hints": true,
+  "show_arrows": true,
+  "show_minimap": false,
+  "show_timer": true,
+  "show_bot_hud": true,
+  "show_stamina": true,
+  "particle_density": 1.0,
+  "bg_density": 1.0,
+  "shake_strength": 1.0,
+  "hud_scale": 1.0,
+  "touch_opacity": 1.0
+}
