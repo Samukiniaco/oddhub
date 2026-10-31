@@ -12,15 +12,9 @@ Legenda de status: `planejado` | `em andamento` | `protótipo` | `funcional` | `
 ## Apps planejados
 | App | Tipo | Abordagem | Status | Notas |
 |-----|------|-----------|--------|-------|
-| WhatsApp | messaging | scraping/web | planejado | Sem API pública de consumidor |
-| Instagram | social | scraping/API | planejado | API limitada (Basic Display) |
-| Pinterest | social | API oficial | planejado | API disponível |
-| Google (busca) | search | Custom Search API | planejado | Requer chave API |
-| Google Maps | maps | scraping/geo | planejado | geolocalização via IP/GPS |
-| Spotify | music | Web API + previews | planejado | DRM impede stream completo |
-| YouTube Music | music | Data API | planejado | Reprodução via mpv quando possível |
-| Netflix | streaming | metadados + deep-link | planejado | DRM (Widevine) impede reprodução |
-| Crunchyroll | streaming | metadados + deep-link | planejado | DRM impede reprodução |
+NENHUM AINDA, PRECISA DE ALGO PRA MIM ANOTAAAAAAAARRRRRRRR
+
+*obs: tinha sim coisa escrita, mas apaguei pq certa IA foi burra e colocou os apps de exemplo como se fossem verídicos*
 
 ## Histórico
 - (adicione entradas conforme progresso)
