@@ -9,53 +9,36 @@
   },
   "apps": [
     {
+      "id": "crunchyroll",
+      "name": "AniPort",
+      "type": "streaming",
+      "approach": "scraping/api",
+      "status": "planejado",
+      "priority": 0
+    },
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp",
+      "type": "chat",
+      "approach": "scraping/api",
+      "status": "planejado",
+      "priority": 0
+    },
+    {
       "id": "pinterest",
       "name": "Pinterest",
-      "type": "social",
+      "type": "image",
       "approach": "api",
-      "status": "planejado"
+      "status": "planejado",
+      "priority": 0
     },
     {
-      "id": "google",
-      "name": "Google (busca)",
-      "type": "search",
+      "id": "youtube",
+      "name": "PortTube",
+      "type": "video",
       "approach": "api",
-      "status": "planejado"
-    },
-    {
-      "id": "googlemaps",
-      "name": "Google Maps",
-      "type": "maps",
-      "approach": "scraping/geo",
-      "status": "planejado"
-    },
-    {
-      "id": "spotify",
-      "name": "Spotify",
-      "type": "music",
-      "approach": "api+previews",
-      "status": "planejado"
-    },
-    {
-      "id": "youtubemusic",
-      "name": "YouTube Music",
-      "type": "music",
-      "approach": "api+mpv",
-      "status": "planejado"
-    },
-    {
-      "id": "netflix",
-      "name": "Netflix",
-      "type": "streaming",
-      "approach": "metadata+deeplink",
-      "status": "planejado"
-    },
-    {
-      "id": "crunchyroll",
-      "name": "Crunchyroll",
-      "type": "streaming",
-      "approach": "metadata+deeplink",
-      "status": "planejado"
+      "status": "planejado",
+      "priority": 0
     }
   ]
 }

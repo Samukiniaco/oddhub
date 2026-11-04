@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./PortTube.sh</path>
+    <name>PortTube</name>
+    <desc>Port de PortTube para PortMaster.</desc>
+    <developer>Samuka</developer>
+    <publisher>Open Source</publisher>
+    <genre>Video</genre>
+  </game>
+</gameList>

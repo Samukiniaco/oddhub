@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "name": "crunchyroll.zip",
+  "items": [
+    "AniPort.sh",
+    "crunchyroll"
+  ],
+  "items_opt": [],
+  "attr": {
+    "title": "AniPort",
+    "porter": [
+      "Samuka"
+    ],
+    "desc": "Port de AniPort para PortMaster.",
+    "inst": "Instale o port e configure credenciais se necessário.",
+    "genres": [
+      "streaming"
+    ],
+    "image": null,
+    "rtr": false,
+    "exp": false,
+    "runtime": [
+      "python_3.11"
+    ],
+    "store": [],
+    "availability": "full",
+    "reqs": [],
+    "arch": [
+      "aarch64"
+    ],
+    "min_glibc": ""
+  }
+}

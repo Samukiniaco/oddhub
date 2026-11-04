@@ -118,6 +118,7 @@ class PortManagerApp:
         btn_frame.pack(fill="x", padx=5, pady=5)
         ttk.Button(btn_frame, text="Adicionar Nota", command=self.add_note).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Novo App", command=self.add_app).pack(side="left", padx=2)
+        ttk.Button(btn_frame, text="Editar App", command=self.edit_app).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Excluir App", command=self.delete_app).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Subir", command=self.move_up).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Descer", command=self.move_down).pack(side="left", padx=2)
@@ -296,6 +297,56 @@ class PortManagerApp:
             dlg.destroy()
             messagebox.showinfo("Sucesso", f"App '{new_id}' criado com sucesso.")
         btn = Button(dlg, text="Criar", command=submit)
+        btn.pack(side="bottom", pady=10)
+
+    def edit_app(self):
+        if not self.selected_app_id:
+            messagebox.showwarning("Aviso", "Selecione um app para editar.")
+            return
+        app = next((a for a in self.apps if a["id"] == self.selected_app_id), None)
+        if not app:
+            messagebox.showerror("Erro", "App não encontrado.")
+            return
+        dlg = Toplevel(self.root)
+        dlg.title(f"Editar App - {app['id']}")
+        dlg.geometry("400x350")
+        form = Frame(dlg)
+        form.pack(padx=10, pady=10)
+        fields = {}
+        # ID (readonly)
+        Label(form, text="ID").grid(row=0, column=0, sticky="w")
+        id_lbl = Label(form, text=app["id"])
+        id_lbl.grid(row=0, column=1, sticky="w")
+        # Outros campos
+        rows = [("Nome", "name"), ("Tipo", "type"), ("Aproximação", "approach"), ("Status", "status"), ("Prioridade", "priority")]
+        for idx, (lbl, key) in enumerate(rows, start=1):
+            Label(form, text=lbl).grid(row=idx, column=0, sticky="w")
+            if key == "status":
+                var = StringVar(value=app.get(key, "planejado"))
+                opts = OptionMenu(form, var, "planejado", "em andamento", "protótipo", "funcional", "pausado")
+                opts.grid(row=idx, column=1)
+                fields[key] = var
+            else:
+                ent = Entry(form)
+                ent.insert(0, str(app.get(key, "")))
+                ent.grid(row=idx, column=1)
+                fields[key] = ent
+        def submit():
+            app["name"] = fields["name"].get().strip() or app["id"]
+            app["type"] = fields["type"].get().strip() or "utility"
+            app["approach"] = fields["approach"].get().strip() or "planejado"
+            app["status"] = fields["status"].get() or "planejado"
+            try:
+                app["priority"] = int(fields["priority"].get() or 0)
+            except ValueError:
+                messagebox.showerror("Erro", "Prioridade deve ser número.")
+                return
+            self._persist()
+            self.refresh_tree()
+            self.tree.selection_set(self.selected_app_id)
+            dlg.destroy()
+            messagebox.showinfo("Sucesso", f"App '{app['id']}' atualizado.")
+        btn = Button(dlg, text="Salvar", command=submit)
         btn.pack(side="bottom", pady=10)
 
     def delete_app(self):

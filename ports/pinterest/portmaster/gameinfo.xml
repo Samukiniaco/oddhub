@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./Pinterest.sh</path>
+    <name>Pinterest</name>
+    <desc>Port de Pinterest para PortMaster.</desc>
+    <developer>Samuka</developer>
+    <publisher>Open Source</publisher>
+    <genre>Image</genre>
+  </game>
+</gameList>
