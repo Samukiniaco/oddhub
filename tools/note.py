@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
-"""Adiciona uma nota rápida a NOTES.md.
-Uso: python tools/note.py "WhatsApp - ver API web"
+"""Adiciona uma nota rápida ao NOTES.md de um app.
+Uso: python tools/note.py <app_id> "texto"
 """
-import sys, datetime, os
+import sys, datetime
+from pathlib import Path
 
-NOTE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "NOTES.md")
+ROOT = Path(__file__).parent.parent
 
 def main():
-    text = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else input("Nota: ")
+    if len(sys.argv) < 3:
+        print("Uso: python tools/note.py <app_id> \"texto\"")
+        sys.exit(1)
+    app_id = sys.argv[1]
+    text = " ".join(sys.argv[2:])
+    note_path = ROOT / "ports" / app_id / "NOTES.md"
+    note_path.parent.mkdir(parents=True, exist_ok=True)
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    with open(NOTE, "a", encoding="utf-8") as f:
-        f.write(f"- [{ts}] {text}\n")
-    print("Nota adicionada.")
+    line = f"- [{ts}] {text}\n"
+    with open(note_path, "a", encoding="utf-8") as f:
+        f.write(line)
+    print(f"Nota adicionada em {note_path}")
 
 if __name__ == "__main__":
     main()

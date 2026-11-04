@@ -104,7 +104,7 @@ lista os ports (`ports/registry.json`) e permite:
   "Selecionar Tudo"; remove do registro e apaga as pastas dos ports).
 - **Reordenar** por prioridade com os botões Subir/Descer.
 - Abrir um editor de notas para adicionar/editar observações que são salvas em
-  `NOTES.md`.
+  `ports/<id>/NOTES.md` (individual por app).
 - Salvar todas as alterações no `registry.json` e `NOTES.md`.
 
 Executar:

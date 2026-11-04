@@ -9,28 +9,28 @@
   },
   "apps": [
     {
+      "id": "whatsapp",
+      "name": "WhatsApp - *",
+      "type": "chat",
+      "approach": "scraping/api",
+      "status": "planejado",
+      "priority": 4
+    },
+    {
+      "id": "pinterest",
+      "name": "Pinterest - *",
+      "type": "image",
+      "approach": "api",
+      "status": "planejado",
+      "priority": 3
+    },
+    {
       "id": "crunchyroll",
       "name": "AniPort",
       "type": "streaming",
       "approach": "scraping/api",
       "status": "planejado",
-      "priority": 0
-    },
-    {
-      "id": "whatsapp",
-      "name": "WhatsApp",
-      "type": "chat",
-      "approach": "scraping/api",
-      "status": "planejado",
-      "priority": 0
-    },
-    {
-      "id": "pinterest",
-      "name": "Pinterest",
-      "type": "image",
-      "approach": "api",
-      "status": "planejado",
-      "priority": 0
+      "priority": 2
     },
     {
       "id": "youtube",
@@ -38,7 +38,7 @@
       "type": "video",
       "approach": "api",
       "status": "planejado",
-      "priority": 0
+      "priority": 1
     }
   ]
 }

@@ -38,42 +38,25 @@ def save_registry(data=None):
         json.dump(REGISTRY_DATA, f, ensure_ascii=False, indent=2)
 
 def load_notes():
-    """Retorna dict app_id -> list de notas (linhas) de NOTES.md."""
+    """Retorna dict app_id -> list de notas (linhas) de ports/<id>/NOTES.md."""
     notes = {}
-    if not NOTES_PATH.exists():
-        return notes
-    with open(NOTES_PATH, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or not line.startswith("-"):
-                continue
-            # formato: - [2026-10-30 22:18] App - texto
-            if " - " in line:
-                parts = line[2:].split(" - ", 1)
-                hint = parts[1] if len(parts) > 1 else ""
-                # associa a apps cujo id aparece no hint
-                for app in REGISTRY_DATA.get("apps", []):
-                    if app["id"] in hint or app["name"] in hint:
-                        notes.setdefault(app["id"], []).append(line)
-                        break
+    for app in REGISTRY_DATA.get("apps", []):
+        aid = app["id"]
+        note_path = ROOT / "ports" / aid / "NOTES.md"
+        if note_path.exists():
+            lines = [line.strip() for line in note_path.read_text(encoding="utf-8").splitlines()
+                     if line.strip() and line.strip().startswith("-")]
+            notes[aid] = lines
     return notes
 
 
 def save_notes(notes_by_id):
-    """Escreve o arquivo de notas inteiro."""
-    lines = [
-        "# Notas de pesquisa — OddHub",
-        "",
-        "Use `python tools/note.py \"texto\"` para adicionar rapidamente.",
-        "Ou edite este arquivo diretamente.",
-        "",
-        "---"
-    ]
-    for note_lines in notes_by_id.values():
-        for ln in note_lines:
-            lines.append(ln)
-    with open(NOTES_PATH, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
+    """Escreve as notas de cada app em ports/<id>/NOTES.md."""
+    for aid, lines in notes_by_id.items():
+        note_path = ROOT / "ports" / aid / "NOTES.md"
+        note_path.parent.mkdir(parents=True, exist_ok=True)
+        content = f"# Notas — {aid}\n\n" + "\n".join(lines) + "\n"
+        note_path.write_text(content, encoding="utf-8")
 
 
 class PortManagerApp:
