@@ -242,7 +242,7 @@ class PortManagerApp:
         # Diálogo para adicionar um novo app
         dlg = Toplevel(self.root)
         dlg.title("Novo App")
-        dlg.geometry("300x250")
+        dlg.geometry("400x380")
         form = Frame(dlg)
         form.pack(padx=10, pady=10)
         fields = {}
@@ -296,7 +296,7 @@ class PortManagerApp:
             dlg.destroy()
             messagebox.showinfo("Sucesso", f"App '{new_id}' criado com sucesso.")
         btn = Button(dlg, text="Criar", command=submit)
-        btn.grid(row=len(fields)+1, column=0, columnspan=2, pady=5)
+        btn.pack(side="bottom", pady=10)
 
     def delete_app(self):
         ids = list(self.selected_app_ids) or ([self.selected_app_id] if self.selected_app_id else [])
