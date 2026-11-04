@@ -98,7 +98,8 @@ lista os ports (`ports/registry.json`) e permite:
   funcional / pausado).
 - **Criar** um novo app (gera o port via `tools/new_port.py` e registra no
   `registry.json`).
-- **Excluir** um app (remove do registro e apaga a pasta do port).
+- **Excluir** um ou vários apps de uma vez (seleção múltipla com Ctrl/Shift ou
+  "Selecionar Tudo"; remove do registro e apaga as pastas dos ports).
 - **Reordenar** por prioridade com os botões Subir/Descer.
 - Abrir um editor de notas para adicionar/editar observações que são salvas em
   `NOTES.md`.

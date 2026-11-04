@@ -101,7 +101,8 @@ class PortManagerApp:
         tree_frame = ttk.Frame(self.root)
         tree_frame.pack(fill="both", expand=True, padx=5, pady=5)
         columns = ("id", "name", "type", "approach", "status", "priority")
-        self.tree = ttk.Treeview(tree_frame, columns=columns, show="headings")
+        self.tree = ttk.Treeview(tree_frame, columns=columns, show="headings",
+                                 selectmode="extended")
         for col in columns:
             self.tree.heading(col, text=col.capitalize())
             self.tree.column(col, width=120, anchor="center")
@@ -120,14 +121,20 @@ class PortManagerApp:
         ttk.Button(btn_frame, text="Excluir App", command=self.delete_app).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Subir", command=self.move_up).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Descer", command=self.move_down).pack(side="left", padx=2)
+        ttk.Button(btn_frame, text="Selecionar Tudo", command=self.select_all).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Salvar", command=self.save_changes).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Sair", command=self.root.destroy).pack(side="right", padx=2)
 
         self.selected_app_id = None
+        self.selected_app_ids = []
 
     def on_select(self, _event=None):
         sel = self.tree.selection()
+        self.selected_app_ids = list(sel)
         self.selected_app_id = sel[0] if sel else None
+
+    def select_all(self):
+        self.tree.selection_set(self.tree.get_children())
 
     def _index_selected(self):
         for i, a in enumerate(self.apps):
@@ -136,6 +143,9 @@ class PortManagerApp:
         return -1
 
     def move_up(self):
+        if len(self.selected_app_ids) > 1:
+            messagebox.showwarning("Aviso", "Selecione apenas um app para reordenar.")
+            return
         i = self._index_selected()
         if i > 0:
             self.apps[i - 1], self.apps[i] = self.apps[i], self.apps[i - 1]
@@ -144,6 +154,9 @@ class PortManagerApp:
             self.tree.selection_set(self.selected_app_id)
 
     def move_down(self):
+        if len(self.selected_app_ids) > 1:
+            messagebox.showwarning("Aviso", "Selecione apenas um app para reordenar.")
+            return
         i = self._index_selected()
         if 0 <= i < len(self.apps) - 1:
             self.apps[i + 1], self.apps[i] = self.apps[i], self.apps[i + 1]
@@ -171,18 +184,25 @@ class PortManagerApp:
             self.edit_note()
 
     def change_status(self):
-        if not self.selected_app_id:
+        ids = self.selected_app_ids or ([self.selected_app_id] if self.selected_app_id else [])
+        if not ids:
             messagebox.showwarning("Aviso", "Selecione um app primeiro.")
             return
         new_status = self.status_var.get()
         for app in self.apps:
-            if app["id"] == self.selected_app_id:
+            if app["id"] in ids:
                 app["status"] = new_status
-                self.refresh_tree()
-                break
-        messagebox.showinfo("Status alterado", f"App {self.selected_app_id} marcado como {new_status}")
+        self._persist()
+        self.refresh_tree()
+        for aid in ids:
+            if self.tree.exists(aid):
+                self.tree.selection_add(aid)
+        messagebox.showinfo("Status alterado", f"{len(ids)} app(s) marcado(s) como {new_status}")
 
     def add_note(self):
+        if len(self.selected_app_ids) > 1:
+            messagebox.showwarning("Aviso", "Selecione apenas um app para editar notas.")
+            return
         if not self.selected_app_id:
             messagebox.showwarning("Aviso", "Selecione um app primeiro.")
             return
@@ -279,22 +299,27 @@ class PortManagerApp:
         btn.grid(row=len(fields)+1, column=0, columnspan=2, pady=5)
 
     def delete_app(self):
-        if not self.selected_app_id:
-            messagebox.showwarning("Aviso", "Selecione um app para excluir.")
+        ids = list(self.selected_app_ids) or ([self.selected_app_id] if self.selected_app_id else [])
+        if not ids:
+            messagebox.showwarning("Aviso", "Selecione um ou mais apps para excluir.")
             return
-        app_id = self.selected_app_id
-        if not messagebox.askyesno("Confirmar", f"Excluir o app '{app_id}'? Isso removerá o diretório do port."):
+        nomes = ", ".join(ids)
+        if not messagebox.askyesno(
+                "Confirmar",
+                f"Excluir {len(ids)} app(s)?\n\n{nomes}\n\nIsso removerá os diretórios dos ports."):
             return
         # remover do registry
-        self.apps = [a for a in self.apps if a["id"] != app_id]
-        # deletar diretório do port
-        port_dir = ROOT / "ports" / app_id
-        if port_dir.exists():
-            shutil.rmtree(port_dir, ignore_errors=True)
+        self.apps = [a for a in self.apps if a["id"] not in ids]
+        # deletar diretórios dos ports
+        for aid in ids:
+            port_dir = ROOT / "ports" / aid
+            if port_dir.exists():
+                shutil.rmtree(port_dir, ignore_errors=True)
         self.selected_app_id = None
-        self.save_changes()
+        self.selected_app_ids = []
+        self._persist()
         self.refresh_tree()
-        messagebox.showinfo("Excluído", f"App '{app_id}' excluído.")
+        messagebox.showinfo("Excluído", f"{len(ids)} app(s) excluído(s).")
 
     def edit_priority(self):
         if not self.selected_app_id:
