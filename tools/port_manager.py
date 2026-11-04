@@ -2,13 +2,15 @@
 """OddHub Port Manager — GUI para listar/editar status e notas de cada app.
 
 Usa como base os dados de `ports/registry.json` e `NOTES.md`.
-Permite marcar status, adicionar/editar notas, e salvar tudo.
+Permite marcar status, adicionar/editar notas, gerenciar apps (novo/excluir) e definir prioridades.
 """
 import json
 import os
 import sys
+import shutil
 from pathlib import Path
-from tkinter import Tk, ttk, messagebox, scrolledtext, Toplevel, StringVar, OptionMenu, Label, Button
+from tkinter import Tk, ttk, messagebox, scrolledtext, Toplevel, StringVar, OptionMenu, Label, Button, Entry, Frame
+import subprocess
 
 ROOT = Path(__file__).parent.parent
 REGISTRY_PATH = ROOT / "ports" / "registry.json"
@@ -95,10 +97,10 @@ class PortManagerApp:
         status_combo.pack(side="left", padx=5)
         ttk.Button(top, text="Alterar Status", command=self.change_status).pack(side="left", padx=5)
 
-        # Treeview para listar apps
+        # Treeview para listar apps (inclui priority)
         tree_frame = ttk.Frame(self.root)
         tree_frame.pack(fill="both", expand=True, padx=5, pady=5)
-        columns = ("id", "name", "type", "approach", "status")
+        columns = ("id", "name", "type", "approach", "status", "priority")
         self.tree = ttk.Treeview(tree_frame, columns=columns, show="headings")
         for col in columns:
             self.tree.heading(col, text=col.capitalize())
@@ -108,15 +110,46 @@ class PortManagerApp:
         self.tree.configure(yscroll=scrollbar.set)
         scrollbar.pack(side="right", fill="y")
         self.tree.bind("<Double-1>", self.on_double_click)
+        self.tree.bind("<<TreeviewSelect>>", self.on_select)
 
         # Botões inferiores
         btn_frame = ttk.Frame(self.root)
         btn_frame.pack(fill="x", padx=5, pady=5)
         ttk.Button(btn_frame, text="Adicionar Nota", command=self.add_note).pack(side="left", padx=2)
+        ttk.Button(btn_frame, text="Novo App", command=self.add_app).pack(side="left", padx=2)
+        ttk.Button(btn_frame, text="Excluir App", command=self.delete_app).pack(side="left", padx=2)
+        ttk.Button(btn_frame, text="Subir", command=self.move_up).pack(side="left", padx=2)
+        ttk.Button(btn_frame, text="Descer", command=self.move_down).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Salvar", command=self.save_changes).pack(side="left", padx=2)
         ttk.Button(btn_frame, text="Sair", command=self.root.destroy).pack(side="right", padx=2)
 
         self.selected_app_id = None
+
+    def on_select(self, _event=None):
+        sel = self.tree.selection()
+        self.selected_app_id = sel[0] if sel else None
+
+    def _index_selected(self):
+        for i, a in enumerate(self.apps):
+            if a["id"] == self.selected_app_id:
+                return i
+        return -1
+
+    def move_up(self):
+        i = self._index_selected()
+        if i > 0:
+            self.apps[i - 1], self.apps[i] = self.apps[i], self.apps[i - 1]
+            self._persist()
+            self.refresh_tree()
+            self.tree.selection_set(self.selected_app_id)
+
+    def move_down(self):
+        i = self._index_selected()
+        if 0 <= i < len(self.apps) - 1:
+            self.apps[i + 1], self.apps[i] = self.apps[i], self.apps[i + 1]
+            self._persist()
+            self.refresh_tree()
+            self.tree.selection_set(self.selected_app_id)
 
     def refresh_tree(self):
         for row in self.tree.get_children():
@@ -127,7 +160,8 @@ class PortManagerApp:
                 app["name"],
                 app["type"],
                 app["approach"],
-                app.get("status", "planejado")
+                app.get("status", "planejado"),
+                app.get("priority", 0)
             ))
 
     def on_double_click(self, event):
@@ -176,10 +210,117 @@ class PortManagerApp:
             messagebox.showinfo("Salvo", "Nota(s) salvas.")
         ttk.Button(note_window, text="Salvar", command=save_note).pack(pady=5)
 
-    def save_changes(self):
+    def _persist(self):
         self.registry["apps"] = self.apps
         save_registry(self.registry)
+
+    def save_changes(self):
+        self._persist()
         messagebox.showinfo("Concluído", "Todas as alterações salvas.")
+
+    def add_app(self):
+        # Diálogo para adicionar um novo app
+        dlg = Toplevel(self.root)
+        dlg.title("Novo App")
+        dlg.geometry("300x250")
+        form = Frame(dlg)
+        form.pack(padx=10, pady=10)
+        fields = {}
+        labels = [("ID", "id"), ("Nome", "name"), ("Tipo", "type"), ("Aproximação", "approach"), ("Status", "status"), ("Prioridade", "priority")]
+        for lbl, key in labels:
+            Label(form, text=lbl).grid(row=len(fields), column=0, sticky="w")
+            if key == "status":
+                var = StringVar(value="planejado")
+                opts = OptionMenu(form, var, "planejado", "em andamento", "protótipo", "funcional", "pausado")
+                opts.grid(row=len(fields), column=1)
+                fields[key] = var
+            else:
+                ent = Entry(form)
+                ent.grid(row=len(fields), column=1)
+                fields[key] = ent
+        def submit():
+            # validar id unico
+            new_id = fields["id"].get().strip().lower()
+            if not new_id or not new_id.isalnum():
+                messagebox.showerror("Erro", "ID deve ser alfanumérico e não vazio")
+                return
+            if any(a["id"] == new_id for a in self.apps):
+                messagebox.showerror("Erro", f"App com ID '{new_id}' já existe")
+                return
+            name = fields["name"].get().strip() or new_id
+            app_type = fields["type"].get().strip() or "utility"
+            approach = fields["approach"].get().strip() or "planejado"
+            status = fields["status"].get() or "planejado"
+            try:
+                priority = int(fields["priority"].get() or 0)
+            except ValueError:
+                priority = 0
+            # gerar port usando tools/new_port.py (caminho absoluto)
+            script = str(ROOT / "tools" / "new_port.py")
+            try:
+                subprocess.run([sys.executable, script, new_id, name, "--genre", app_type], check=True)
+            except subprocess.CalledProcessError as e:
+                messagebox.showerror("Erro", f"Falha ao gerar port: {e}")
+                return
+            # registra no registry.json
+            self.apps.append({
+                "id": new_id,
+                "name": name,
+                "type": app_type,
+                "approach": approach,
+                "status": status,
+                "priority": priority,
+            })
+            self.save_changes()
+            self.refresh_tree()
+            dlg.destroy()
+            messagebox.showinfo("Sucesso", f"App '{new_id}' criado com sucesso.")
+        btn = Button(dlg, text="Criar", command=submit)
+        btn.grid(row=len(fields)+1, column=0, columnspan=2, pady=5)
+
+    def delete_app(self):
+        if not self.selected_app_id:
+            messagebox.showwarning("Aviso", "Selecione um app para excluir.")
+            return
+        app_id = self.selected_app_id
+        if not messagebox.askyesno("Confirmar", f"Excluir o app '{app_id}'? Isso removerá o diretório do port."):
+            return
+        # remover do registry
+        self.apps = [a for a in self.apps if a["id"] != app_id]
+        # deletar diretório do port
+        port_dir = ROOT / "ports" / app_id
+        if port_dir.exists():
+            shutil.rmtree(port_dir, ignore_errors=True)
+        self.selected_app_id = None
+        self.save_changes()
+        self.refresh_tree()
+        messagebox.showinfo("Excluído", f"App '{app_id}' excluído.")
+
+    def edit_priority(self):
+        if not self.selected_app_id:
+            messagebox.showwarning("Aviso", "Selecione um app para editar prioridade.")
+            return
+        # abrir diálogo para editar prioridade
+        dlg = Toplevel(self.root)
+        dlg.title("Editar Prioridade")
+        Label(dlg, text="Prioridade (número):").pack(padx=10, pady=5)
+        entry = Entry(dlg)
+        entry.insert(0, str(next((a.get("priority", 0) for a in self.apps if a["id"] == self.selected_app_id), 0)))
+        entry.pack(padx=10, pady=5)
+        def submit():
+            try:
+                prio = int(entry.get())
+                for a in self.apps:
+                    if a["id"] == self.selected_app_id:
+                        a["priority"] = prio
+                        break
+                self.save_changes()
+                self.refresh_tree()
+                dlg.destroy()
+                messagebox.showinfo("Sucesso", "Prioridade atualizada.")
+            except ValueError:
+                messagebox.showerror("Erro", "Prioridade deve ser um número.")
+        Button(dlg, text="OK", command=submit).pack(pady=5)
 
 
 def main():
