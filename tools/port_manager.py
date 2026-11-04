@@ -209,9 +209,8 @@ class PortManagerApp:
             return
         note_window = Toplevel(self.root)
         note_window.title(f"Nota para {self.selected_app_id}")
-        note_window.geometry("400x300")
+        note_window.geometry("400x350")
         note_text = scrolledtext.ScrolledText(note_window, wrap="word")
-        note_text.pack(fill="both", expand=True, padx=5, pady=5)
         # carrega notas existentes para o app
         existing = "\n".join(self.notes.get(self.selected_app_id, []))
         if existing:
@@ -229,7 +228,9 @@ class PortManagerApp:
             save_notes(self.notes)
             note_window.destroy()
             messagebox.showinfo("Salvo", "Nota(s) salvas.")
-        ttk.Button(note_window, text="Salvar", command=save_note).pack(pady=5)
+        # botão de salvar por baixo (sempre visível)
+        ttk.Button(note_window, text="Salvar", command=save_note).pack(side="bottom", pady=5)
+        note_text.pack(fill="both", expand=True, padx=5, pady=5)
 
     def _persist(self):
         self.registry["apps"] = self.apps
