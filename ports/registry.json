@@ -9,10 +9,10 @@
   },
   "apps": [
     {
-      "id": "whatsapp",
-      "name": "WhatsApp - *",
-      "type": "chat",
-      "approach": "scraping/api",
+      "id": "gmail",
+      "name": "PortMail",
+      "type": "mail",
+      "approach": "api",
       "status": "planejado",
       "priority": 4
     },
