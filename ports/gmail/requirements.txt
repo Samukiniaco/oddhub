@@ -1,0 +1,21 @@
+# Dependências Python do port PortMail (aarch64 / Python 3.11).
+#
+# O modo demo NÃO precisa de nada além do pygame que já acompanha o
+# runtime python_3.11 do PortMaster.
+#
+# O backend real usa IMAP/SMTP nativo do Python (imaplib, smtplib).
+# Não há dependências extras necessárias para o backend real.
+#
+# Requisitos do backend real:
+# - Conta IMAP/SMTP configurada (ex: Gmail, Outlook, etc.)
+# - Senha de aplicativo (para Gmail: https://myaccount.google.com/apppasswords)
+#
+# Configuração rápida (Gmail):
+# 1. Ative 2FA na conta Google
+# 2. Gere uma senha de aplicativo
+# 3. Configure no port: Configurações > Contas > Adicionar
+#
+# Configuração rápida (Outlook):
+# 1. Ative IMAP no Outlook
+# 2. Use credenciais normais
+# 3. Configure no port: Configurações > Contas > Adicionar
