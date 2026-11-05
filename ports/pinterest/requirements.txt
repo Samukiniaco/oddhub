@@ -1,1 +1,16 @@
-# Dependencias Python do port (aarch64 / cp311).\nrequests>=2.31\n# beautifulsoup4>=4.12   # scraping HTML\n# pillow>=10.0           # imagens\n
+# Dependências Python do port Pinterest (aarch64 / Python 3.11).
+#
+# O modo demo NÃO precisa de nada além do pygame que já acompanha o
+# runtime python_3.11 do PortMaster.
+#
+# O backend real usa a API v5 do Pinterest via urllib (stdlib) —
+# também não há dependências extras. Apenas é necessário um token:
+#
+#   PINTEREST_TOKEN=<seu token>   (ou Configurações > Token API no port)
+#
+# Como obter um token da API do Pinterest:
+# 1. Acesse https://developers.pinterest.com/apps/
+# 2. Crie um app e gere um token de acesso (escopo mínimo: boards_read, pins_read)
+# 3. Configure no port ou exporte PINTEREST_TOKEN antes de iniciar
+#
+# Obs.: o port não faz login social no dispositivo; o token é colado manualmente.

@@ -3,9 +3,9 @@
   <game>
     <path>./Pinterest.sh</path>
     <name>Pinterest</name>
-    <desc>Port de Pinterest para PortMaster.</desc>
+    <desc>Port de Pinterest para PortMaster (feed de pins).</desc>
     <developer>Samuka</developer>
     <publisher>Open Source</publisher>
-    <genre>Image</genre>
+    <genre>Utility</genre>
   </game>
 </gameList>

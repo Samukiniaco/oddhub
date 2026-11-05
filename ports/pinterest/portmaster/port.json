@@ -11,10 +11,10 @@
     "porter": [
       "Samuka"
     ],
-    "desc": "Port de Pinterest para PortMaster.",
-    "inst": "Instale o port e configure credenciais se necessário.",
+    "desc": "Port de Pinterest para PortMaster (feed de pins).",
+    "inst": "Modo demo funciona sem configuração. Para a API real, defina PINTEREST_TOKEN.",
     "genres": [
-      "image"
+      "utility"
     ],
     "image": null,
     "rtr": false,
