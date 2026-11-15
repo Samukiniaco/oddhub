@@ -15,6 +15,7 @@ Ready to run. The ports of the collection show up automatically when they are in
 | D-Pad | Move selection |
 | A | Open port |
 | Y | Details |
+| Tab | Search the collection |
 | B | Back |
 
 CFW Tests:

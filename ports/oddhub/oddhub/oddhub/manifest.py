@@ -29,7 +29,16 @@ def manifest_path() -> Path:
 def load_manifest() -> list[dict]:
     """Ports da colecao, do manifesto que veio no pacote."""
     data = storage.read_json(manifest_path(), default=[])
-    return data if isinstance(data, list) else []
+    if not isinstance(data, list):
+        return []
+    # O manifesto pode ser uma lista de ids ou de objetos completos.
+    out = []
+    for entry in data:
+        if isinstance(entry, str):
+            out.append({"id": entry, "title": entry, "desc": "", "script": ""})
+        elif isinstance(entry, dict):
+            out.append(entry)
+    return out
 
 
 def installed_ports() -> list[dict]:
@@ -83,10 +92,12 @@ def collection() -> list[dict]:
         item = dict(entry)
         item["installed"] = entry["id"] in installed
         item["path"] = installed.get(entry["id"], {}).get("path", "")
+        item.setdefault("category", item.get("type", "utility"))
         out.append(item)
     for port_id, port in installed.items():
         if not any(entry["id"] == port_id for entry in manifest):
             item = dict(port)
             item["installed"] = True
+            item.setdefault("category", "utility")
             out.append(item)
     return out

@@ -106,7 +106,15 @@ def generate_manifest() -> Path:
             desc = attr.get("desc", "")
             scripts = [item for item in (data.get("items") or []) if item.endswith(".sh")]
             script = scripts[0] if scripts else ""
-        entries.append({"id": app_id, "title": title, "desc": desc, "script": script})
+        entries.append(
+            {
+                "id": app_id,
+                "title": title,
+                "desc": desc,
+                "script": script,
+                "category": app.get("type", "utility"),
+            }
+        )
 
     dest = PORTS / "oddhub" / "oddhub" / "oddhub" / "ports.json"
     dest.parent.mkdir(parents=True, exist_ok=True)

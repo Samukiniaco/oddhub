@@ -13,7 +13,8 @@ The interface is drawn at 640x480 and scaled to the screen, and the whole thing 
 | D-Pad | Move selection |
 | A | Open port |
 | Y | Details |
-| B | Back / quit |
+| Tab | Search the collection |
+| B | Back |
 | Select+Start | Quit |
 
 ## Dependencies
