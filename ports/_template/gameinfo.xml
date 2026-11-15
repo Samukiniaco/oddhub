@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./{{SCRIPT}}</path>
+    <name>{{TITLE}}</name>
+    <desc>{{DESC}}</desc>
+    <releasedate>{{DATE}}T000000</releasedate>
+    <developer>Samuka</developer>
+    <publisher>Open Source</publisher>
+    <genre>{{GENRE_TITLE}}</genre>
+    <image>./{{ID}}/screenshot.png</image>
+  </game>
+</gameList>

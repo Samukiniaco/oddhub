@@ -10,11 +10,16 @@ dist/
 
 # Port runtime/deps pesados
 port de ref/
-port de ref/cavo/site-packages/
-port de ref/cavo/deps/
-port de ref/cavo/libs.aarch64/
-port de ref/cavo/cavo/__pycache__/
 **/__pycache__/
+*.pyc
+*.pyo
+
+# Core vendorizado dentro de cada port (entra no zip, nao no git)
+ports/*/*/core/
+
+# Dependencias baixadas para o aparelho
+ports/*/*/site-packages/
+ports/*/*/deps/
 
 # Conf/local
 **/conf/

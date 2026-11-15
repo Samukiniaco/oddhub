@@ -1,1 +1,0 @@
-"""Reprodução de mídia via processo externo (mpv/ffplay)."""

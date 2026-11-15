@@ -1,1 +1,1 @@
-"""Reprodução de mídia via processo externo (mpv/ffplay)."""
+"""Midia compartilhada pelos ports."""

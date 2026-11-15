@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Adiciona uma nota rápida ao NOTES.md de um app.
+"""Adiciona uma nota ao NOTES.md de um app.
+
 Uso: python tools/note.py <app_id> "texto"
 """
 import sys, datetime
@@ -9,7 +10,7 @@ ROOT = Path(__file__).parent.parent
 
 def main():
     if len(sys.argv) < 3:
-        print("Uso: python tools/note.py <app_id> \"texto\"")
+        print('Uso: python tools/note.py <app_id> "texto"')
         sys.exit(1)
     app_id = sys.argv[1]
     text = " ".join(sys.argv[2:])

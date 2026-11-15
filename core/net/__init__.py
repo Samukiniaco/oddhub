@@ -1,1 +1,1 @@
-"""Camada de rede: HTTP, cache, auth."""
+"""Rede e cache compartilhados pelos ports."""

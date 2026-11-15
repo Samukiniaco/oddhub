@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./OddHub.sh</path>
+    <name>OddHub</name>
+    <desc>Gerenciador da colecao OddHub: mostra os ports instalados no aparelho e abre o escolhido.</desc>
+    <releasedate>20261115T000000</releasedate>
+    <developer>Samuka</developer>
+    <publisher>Open Source</publisher>
+    <genre>Utility</genre>
+    <image>./oddhub/screenshot.png</image>
+  </game>
+</gameList>

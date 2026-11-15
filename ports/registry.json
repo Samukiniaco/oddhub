@@ -1,16 +1,16 @@
 {
   "core": {
-    "status": "em andamento",
-    "notes": "esqueleto, nao pronto para producao"
+    "status": "em uso",
+    "notes": "base compartilhada: janela 640x480 escalada, widgets, teclado virtual, contrato de backend, storage, http sem dependencia extra"
   },
   "oddhub": {
-    "status": "prototipo",
-    "notes": "lista services, UI basica"
+    "status": "em teste",
+    "notes": "gerenciador da colecao: lista os ports instalados e abre o escolhido"
   },
   "apps": [
     {
       "id": "gmail",
-      "name": "Gmail",
+      "name": "PortMail",
       "type": "mail",
       "approach": "imap/smtp",
       "status": "em teste",
@@ -18,7 +18,7 @@
     },
     {
       "id": "pinterest",
-      "name": "Pinterest - *",
+      "name": "Pinterest",
       "type": "image",
       "approach": "api",
       "status": "planejado",
@@ -26,17 +26,17 @@
     },
     {
       "id": "crunchyroll",
-      "name": "AniPort",
+      "name": "Crunchyroll",
       "type": "streaming",
-      "approach": "scraping/api",
+      "approach": "api",
       "status": "planejado",
       "priority": 2
     },
     {
       "id": "youtube",
-      "name": "PortTube",
+      "name": "YouTube",
       "type": "video",
-      "approach": "api",
+      "approach": "yt-dlp",
       "status": "planejado",
       "priority": 1
     }

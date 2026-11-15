@@ -1,0 +1,33 @@
+{
+  "version": 4,
+  "name": "{{ID}}.zip",
+  "items": [
+    "{{SCRIPT}}",
+    "{{ID}}"
+  ],
+  "items_opt": [],
+  "attr": {
+    "title": "{{TITLE}}",
+    "porter": [
+      "Samuka"
+    ],
+    "desc": "{{DESC}}",
+    "desc_md": null,
+    "inst": "Instale o port e abra pelo PortMaster.",
+    "inst_md": null,
+    "genres": [
+      "{{GENRE}}"
+    ],
+    "image": null,
+    "rtr": false,
+    "exp": false,
+    "runtime": [
+      "python_3.11"
+    ],
+    "store": [],
+    "availability": "full",
+    "reqs": [],
+    "arch": [],
+    "min_glibc": ""
+  }
+}

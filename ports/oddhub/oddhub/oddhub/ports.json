@@ -1,0 +1,26 @@
+[
+  {
+    "id": "gmail",
+    "title": "PortMail",
+    "desc": "Cliente de email IMAP/SMTP para PortMaster. Le, responde e envia mensagens da sua propria conta, em tela cheia e com controle.",
+    "script": "PortMail.sh"
+  },
+  {
+    "id": "pinterest",
+    "title": "Pinterest",
+    "desc": "",
+    "script": ""
+  },
+  {
+    "id": "crunchyroll",
+    "title": "Crunchyroll",
+    "desc": "",
+    "script": ""
+  },
+  {
+    "id": "youtube",
+    "title": "YouTube",
+    "desc": "",
+    "script": ""
+  }
+]

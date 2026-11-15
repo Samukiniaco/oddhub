@@ -1,1 +1,1 @@
-"""Camada de UI: renderização, imagens, tema."""
+"""Camada de interface compartilhada (desenho e teclado virtual)."""

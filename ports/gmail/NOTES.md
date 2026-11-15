@@ -1,0 +1,1 @@
+- [2026-11-15 14:33] Port reescrito sobre o core: tela, widgets, teclado e backend saem do core compartilhado.

@@ -2,12 +2,12 @@
   "version": 4,
   "name": "gmail.zip",
   "items": [
-    "Gmail.sh",
+    "PortMail.sh",
     "gmail"
   ],
   "items_opt": [],
   "attr": {
-    "title": "Gmail",
+    "title": "PortMail",
     "porter": [
       "Samuka"
     ],

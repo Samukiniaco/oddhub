@@ -1,1 +1,0 @@
-"""Camada de UI: renderização, imagens, tema."""

@@ -1,20 +1,29 @@
-# PORTS.md — acompanhamento dos ports
+# PORTS.md - acompanhamento da colecao
 
-Legenda de status: `planejado` | `em andamento` | `protótipo` | `funcional` | `pausado`
+Este arquivo e gerado por `python tools/tracker.py --write`.
+O registro que manda e `ports/registry.json`.
 
-## Núcleo
+Legenda de status: planejado (esta no registro, sem codigo) | em andamento (codigo comecando) | em teste (rodando, falta testar no aparelho) | funcional (rodando e testado) | pausado
+
+## Nucleo e gerenciador
+
 | Item | Status | Notas |
 |------|--------|-------|
-| core (esqueleto) | em andamento | Contratos e utilitários mínimos; não pronto para produção |
-| oddhub (gerenciador) | protótipo | Lista services registrados; UI básica |
-| build/release | funcional | tools/build_all.py + GitHub Actions |
+| core (base compartilhada) | em uso | base compartilhada: janela 640x480 escalada, widgets, teclado virtual, contrato de backend, storage, http sem dependencia extra |
+| oddhub (gerenciador) | em teste | gerenciador da colecao: lista os ports instalados e abre o escolhido |
 
-## Apps planejados
-| App | Tipo | Abordagem | Status | Notas |
-|-----|------|-----------|--------|-------|
-NENHUM AINDA, PRECISA DE ALGO PRA MIM ANOTAAAAAAAARRRRRRRR
+## Apps
 
-*obs: tinha sim coisa escrita, mas apaguei pq certa IA foi burra e colocou os apps de exemplo como se fossem verídicos*
+| Id | Port | Tipo | Abordagem | Status | Prioridade |
+|----|------|------|-----------|--------|------------|
+| gmail | PortMail | mail | imap/smtp | em teste | 4 |
+| pinterest | Pinterest | image | api | planejado | 3 |
+| crunchyroll | Crunchyroll | streaming | api | planejado | 2 |
+| youtube | YouTube | video | yt-dlp | planejado | 1 |
 
-## Histórico
-- (adicione entradas conforme progresso)
+## Como mexer
+
+- `python tools/new_port.py <id> "Nome"` cria um port novo a partir do template
+- `python tools/sync_core.py <id>` copia o core para dentro do port
+- `python tools/build_all.py` monta os zips de teste
+- `python tools/port_manager.py` abre o gerenciador grafico do registro

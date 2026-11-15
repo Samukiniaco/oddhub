@@ -1,143 +1,100 @@
-# Coletânea de Ports PortMaster — arquitetura modular
+# Arquitetura do OddHub
 
-## Objetivo
-Portar aplicativos "não convencionais" (WhatsApp, Instagram, Pinterest, Google,
-Spotify, YouTube Music, Netflix, Crunchyroll, ...) para consoles portáteis via
-PortMaster, compartilhando uma base (core) reutilizável.
+## Ideia
 
-## Estrutura de pastas
+Um port = uma pasta em `ports/<id>/`, com um release proprio. O que se repete
+entre eles vive no `core/`. Assim o comportamento do controle, o tamanho da
+tela e as regras de empacotamento sao iguais em todos, e so a logica do app
+muda.
+
+## Layout de um port (layout de PR do PortMaster)
+
 ```
-<raiz>/
-  core/                # biblioteca compartilhada (vendored em cada port no build)
-  ports/               # um port por app (release separada)
-    _template/         # modelo de port
-    cavo/              # (referência) port do jogo CaVo
-  tools/               # build, sync, scaffolding
-  docs/                # esta documentação
-  "port de ref"/       # port de referência original (manter)
-```
-
-## Camadas do core
-1. **platform/** — abstração de dispositivo: display (pygame), input (teclado/mouse/
-   touch/gamepad), settings, storage (conf, bind_directories), saída (quit).
-2. **net/** — HTTP (requests com retry), cache em disco com TTL, auth/tokens.
-3. **ui/** — renderizador de listas/grids/cards, texto, imagens (download+cache+
-   surface), tema.
-4. **scrape/** — contrato de serviço (`Service`) e modelo normalizado (`Item`),
-   registro de plugins.
-5. **media/** — reprodução de mídia via mpv/ffplay (fallback), para vídeo/áudio
-   que o pygame não toca (DRM pode impedir — ver riscos).
-
-## Contrato de um serviço (plugin)
-```python
-class Service:
-    id: str            # ex.: "instagram"
-    name: str          # nome exibido
-    def authenticate(self, creds) -> bool: ...
-    def fetch_home(self) -> list[Item]: ...
-    def search(self, query) -> list[Item]: ...
-    def open(self, item) -> "View": ...   # retorna uma view (tela)
+ports/<id>/
+  port.json            # schema v4 do PortMaster
+  gameinfo.xml         # metadados para a interface do CFW
+  README.md            # notas + controles
+  testing_thread.txt   # texto do thread de teste
+  screenshot.png       # 640x480, ate 100 KB
+  <Nome>.sh            # launcher (nome do titulo, com espaco)
+  <id>/                # pasta do jogo (nome do id, sem espaco)
+    main.py            # ponto de entrada
+    <id>.ini           # mapa de controles do gptokeyb2
+    fetch_deps.py      # gera site-packages/ no PC
+    licenses/
+    core/              # copia do core (vendored, fora do git)
+    <pacote>/          # codigo do port
 ```
 
-## Modelo normalizado
-```python
-@dataclass
-class Item:
-    id: str
-    title: str
-    subtitle: str = ""
-    image_url: str = ""
-    media_url: str = ""
-    kind: str = "card"   # card | list | video | audio | text
-    meta: dict = field(default_factory=dict)
-```
+O `.sh` fica do lado da pasta do jogo, nunca dentro dela. O `core/` e copiado
+para dentro da pasta do jogo por `tools/sync_core.py` e entra no zip.
+
+## O core
+
+| Modulo | Responsabilidade |
+|---|---|
+| `app.py` | `BaseApp`: janela 640x480 logica escalada para a tela real, loop, avisos, clique, painel de modal |
+| `theme.py` | `Theme`: paleta e medidas, com `copy()` para o port ajustar |
+| `ui/widgets.py` | texto, corte, quebra de linha, icones vetoriais, avatar, scrollbar, toast |
+| `ui/keyboard.py` | teclado virtual navegavel por setas, mouse e teclado fisico |
+| `ui/avatars.py` | iniciais e previa de texto |
+| `backend.py` | `Backend`: fila de eventos, status, `emit`/`poll` |
+| `storage.py` | pasta de dados no XDG, cache, JSON atomico |
+| `process.py` | nome do processo (kill switch), dados do aparelho, log |
+| `net/http.py` | HTTP sobre `urllib` |
+| `net/cache.py` | cache em disco com TTL |
+| `media/audio.py` | efeitos e musica com o mixer do pygame |
 
 ## Fluxo de um port
-1. Launcher `.sh` (modelo CaVo.sh): monta runtime python+pygame, define
-   PYTHONPATH com `core/` vendored, roda `main.py`.
-2. `main.py`: inicializa platform, carrega o `Service` do app, loop principal
-   delega telas para o serviço.
-3. Build (`tools/build_release.py`): copia core vendored + app + metadados,
-   gera zip.
 
-## Portabilidade para "dispositivos estranhos"
-- Toda I/O de dispositivo passa por `platform/` (display, input, storage).
-- Novo dispositivo = novo backend em `platform/`, sem tocar nos serviços.
-- Entrada já abstrai teclado/mouse/touch/gamepad (referência CaVo).
+1. **Launcher** (`<Nome>.sh`): acha o `controlfolder`, carrega `control.txt` e
+   o `mod_${CFW_NAME}.txt`, monta o runtime (pygame-ce em squashfs, ou
+   `python_3.11`), faz `bind_directories` dos dados para `conf/<id>/`, sobe o
+   gptokeyb2 com o `.ini` do port e roda `python3 -m <pacote>`.
+2. **App**: herda de `BaseApp`, define o tema, o backend e as telas. O loop e
+   do core: eventos, `update`, `draw`, `present`.
+3. **Backend**: roda em thread quando fala com rede, avisa a UI por eventos.
+   A UI nunca bloqueia esperando o servidor.
 
-## Hub (port gerenciador)
-- Um port extra `ports/hub` funciona como "gerenciador": lista os apps instalados,
-  permite abrir/atualizar/remover e serve de ponto único de entrada.
-- Como compartilham o core, o hub pode rodar os serviços in-process (importando
-  seus `service.py`) ou lançar o `.sh` de cada port via subprocess.
-- O hub também pode baixar novos ports de releases do GitHub.
+## Build
 
-## Dependências por app
-- Cada port declara suas dependências em `requirements.txt` (ex.: requests,
-  beautifulsoup4, mpv bindings, pillow, geopy...).
-- `tools/fetch_deps.py` (gerado por port) baixa wheels aarch64/cp311 para
-  `site-packages/` e `deps/`, seguindo o modelo do port de referência.
-- Dependências de sistema (mpv, ffmpeg, libs) vão em `port.json` -> `reqs` e
-  são documentadas no README do port.
-- O core tenta importar dependências de forma lazy (try/except) para que um app
-  não quebre os outros se faltar um pacote.
+`tools/build_all.py`:
 
-## GitHub e releases
-- Monorepo recomendado: uma pasta por port + core compartilhado.
-- GitHub Actions: job por port que roda `tools/sync_core.py <id>` + fetch_deps
-  + `tools/build_release.py`, publicando `ports/<id>/*.zip` como release asset.
-- Versionamento por port (campo `version` no port.json) e changelog por app.
-- O hub pode consultar a API do GitHub para listar releases e baixar zips.
+1. gera o manifesto da colecao para o gerenciador (`ports.json`);
+2. roda `sync_core.py` em cada port;
+3. monta o zip no layout instalado (script na raiz, pasta do jogo com os
+   metadados dentro);
+4. escreve em `dist/<nome>.zip`.
 
-## Gerenciador GUI (port_manager.py)
+## Gerenciador (oddhub)
 
-Para facilitar a manutenção diária, a coletânea inclui um **GUI simples** que
-lista os ports (`ports/registry.json`) e permite:
+Le o `ports.json` que veio no pacote e procura os ports instalados no cartao
+(a pasta de ports varia por CFW). Mostra o que existe, o que falta e abre o
+escolhido pelo `.sh` dele.
 
-- Selecionar um app e alterar seu **status** (planejado / em andamento / protótipo /
-  funcional / pausado).
-- **Criar** um novo app (gera o port via `tools/new_port.py` e registra no
-  `registry.json`).
-- **Editar** um app (abre o formulário preenchido para alterar nome, tipo,
-  abordagem, status e prioridade).
-- **Excluir** um ou vários apps de uma vez (seleção múltipla com Ctrl/Shift ou
-  "Selecionar Tudo"; remove do registro e apaga as pastas dos ports).
-- **Reordenar** por prioridade com os botões Subir/Descer.
-- Abrir um editor de notas para adicionar/editar observações que são salvas em
-  `ports/<id>/NOTES.md` (individual por app).
-- Salvar todas as alterações no `registry.json` e `NOTES.md`.
+## Registro e acompanhamento
 
-Executar:
+- `ports/registry.json` e a fonte de verdade (maquina).
+- `PORTS.md` e gerado por `tools/tracker.py --write`.
+- `tools/port_manager.py` edita o registro e as notas de cada port
+  (`ports/<id>/NOTES.md`).
 
-```bash
-python tools/port_manager.py
-```
+## Regras de portabilidade
 
-Como alternativa, `tools/tracker.py` exibe uma lista em modo texto.
+- Entrada so por tecla: o gptokeyb2 traduz o controle. Nada de
+  `SDL_JoystickOpen` no app.
+- Desenho em 640x480 logico, escala suave para a tela real.
+- Campos de texto leem `pygame.TEXTINPUT`, para teclado fisico ou OSK do
+  sistema funcionar, e ha um teclado virtual proprio como garantia.
+- Sem `requests` e sem dependencia extra: stdlib + pygame.
+- Sem glifo fora do ASCII: fonte padrao do pygame nao tem seta nem simbolo.
 
-## Dispositivos e geolocalização/mídia
-- Mídia (vídeo/áudio) via processo externo (mpv/ffplay) em tela cheia, pois
-  pygame não decodifica formatos comprimidos/DRM.
-- Geolocalização via serviço de IP ou GPS do dispositivo, abstraído em
-  `core/platform/geo.py` (a implementar quando necessário).
+## Riscos por app
 
-## Riscos e limitações (importante)
-- **DRM/ToS**: Netflix e Crunchyroll não permitem reprodução via scraping
-  (Widevine/PlayReady). Só metadados/capas e deep-links. YouTube/Spotify têm
-  APIs oficiais com limites. WhatsApp/Instagram não têm API pública de consumidor.
-- **Anti-bot**: muitos sites bloqueiam requests simples; pode exigir cookies,
-  tokens ou sessões de navegador real.
-- **Mídia**: pygame não decodifica vídeo/áudio comprimido; usar mpv/ffplay
-  como processo externo (fullscreen) onde o dispositivo permitir.
-- **Legalidade**: respeitar ToS e leis locais; preferir APIs oficiais.
-
-## Próximos passos sugeridos
-1. Confirmar quais apps entram (pesquisa com amigos).
-2. Para cada app: escolher API oficial vs scraping e prototipar o `Service`.
-3. Reaproveitar o port de referência (`port de ref`) como primeiro port real
-   (já tem pygame + input + display).
-4. Criar `tools/new_port.py` para scaffolding.
-```
-
-Then core files. Let me write base.py.<|end|><|start|> assistant to=write<|channel|>analysis <|constrain|>xml<|message|><rfl:parameter name="path">
-C:\Users\ebinh\Desktop\Coisas do Samuka\Meus Games\Go + SDL PORTS\core\__init__.py
+- **DRM**: servicos com Widevine/PlayReady (Netflix, Crunchyroll) nao deixam
+  reproduzir por conta propria. Nesses casos o port faz metadata e link.
+- **API/ToS**: cada servico tem sua regra. O port usa o caminho oficial
+  quando existe, e o usuario fornece a propria credencial.
+- **Marca**: o port nao copia nome, logo, cor ou layout de servico de
+  terceiro. Se o id no registro coincide com o nome de um servico, e so
+  referencia interna; o nome exibido e do port.

@@ -1,170 +1,153 @@
-"""Scaffolding de um novo port.
+"""Cria um port novo a partir de ports/_template.
 
 Uso:
-  python tools/new_port.py <id> <NomeExibido> [--genre action]
+    python tools/new_port.py <id> "Titulo do Port" [--package nome] [--genre other] [--desc "..."]
 
-Cria ports/<id>/ com estrutura mínima e metadados PortMaster.
+O id e o nome da pasta do port e o id no registro da colecao. O titulo e o nome
+que aparece no PortMaster. O script gerado tem o mesmo nome do titulo, e o
+pacote python dentro do port pode ter outro nome (ex.: id gmail, pacote
+portmail).
 """
+from __future__ import annotations
+
 import argparse
-import os
+import datetime
+import json
+import re
 import sys
+from pathlib import Path
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PORTS = os.path.join(ROOT, "ports")
+ROOT = Path(__file__).resolve().parent.parent
+TEMPLATE = ROOT / "ports" / "_template"
+PORTS = ROOT / "ports"
+REGISTRY = PORTS / "registry.json"
 
+GENRE_TITLES = {
+    "action": "Action",
+    "adventure": "Adventure",
+    "arcade": "Arcade",
+    "casino/card": "Card",
+    "fps": "FPS",
+    "platformer": "Platformer",
+    "puzzle": "Puzzle",
+    "racing": "Racing",
+    "rhythm": "Rhythm",
+    "rpg": "RPG",
+    "simulation": "Simulation",
+    "sports": "Sports",
+    "strategy": "Strategy",
+    "visual novel": "Visual Novel",
+    "other": "Other",
+}
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("id")
-    ap.add_argument("title")
-    ap.add_argument("--genre", default="action")
-    args = ap.parse_args()
-
-    pid = args.id.lower()
-    pdir = os.path.join(PORTS, pid)
-    os.makedirs(pdir, exist_ok=True)
-    os.makedirs(os.path.join(pdir, pid), exist_ok=True)
-    os.makedirs(os.path.join(pdir, "portmaster"), exist_ok=True)
-
-    # service.py
-    service_path = os.path.join(pdir, pid, "service.py")
-    if not os.path.exists(service_path):
-        with open(service_path, "w", encoding="utf-8") as f:
-            f.write('''"""Serviço do app {title}."""
-from core.scrape.base import BaseService, Item
-
-
-class Service(BaseService):
-    id = "{pid}"
-    name = "{title}"
-
-    def fetch_home(self):
-        # TODO: implementar busca de dados (API oficial ou scraping)
-        return [Item(id="1", title="Exemplo", subtitle="placeholder")]
-
-    def search(self, query):
-        return []
-
-    def open(self, item):
-        return {{"item": item}}
-'''.format(title=args.title, pid=pid))
-
-    # main.py
-    main_path = os.path.join(pdir, pid, "main.py")
-    if not os.path.exists(main_path):
-        with open(main_path, "w", encoding="utf-8") as f:
-            f.write('''"""Entry point do port {title}."""
-import sys, os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# core vendored esperado em ./core ; fallback para raiz do repo
-root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-if os.path.isdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), "core")):
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-elif os.path.isdir(os.path.join(root, "core")):
-    sys.path.insert(0, root)
-
-from core.platform.storage import game_dir
+METADATA = ("port.json", "README.md", "gameinfo.xml", "testing_thread.txt")
 
 
-def main():
-    print("Port {title} iniciado. Implemente a UI sobre core.")
+def render(text: str, values: dict) -> str:
+    for key, value in values.items():
+        text = text.replace("{{" + key + "}}", value)
+    return text
 
 
-if __name__ == "__main__":
-    main()
-'''.format(title=args.title))
+def write(path: Path, text: str) -> None:
+    """Escreve sempre com LF (CRLF quebra o bash no aparelho)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text.replace("\r\n", "\n"), encoding="utf-8", newline="\n")
 
-    # port.json
-    import json
-    portjson = os.path.join(pdir, "portmaster", "port.json")
-    if not os.path.exists(portjson):
-        with open(portjson, "w", encoding="utf-8") as f:
-            json.dump({
-                "version": 2,
-                "name": pid + ".zip",
-                "items": [args.title.replace(" ", "") + ".sh", pid],
-                "items_opt": [],
-                "attr": {
-                    "title": args.title,
-                    "porter": ["Samuka"],
-                    "desc": "Port de " + args.title + " para PortMaster.",
-                    "inst": "Instale o port e configure credenciais se necessário.",
-                    "genres": [args.genre],
-                    "image": None,
-                    "rtr": False,
-                    "exp": False,
-                    "runtime": ["python_3.11"],
-                    "store": [],
-                    "availability": "full",
-                    "reqs": [],
-                    "arch": ["aarch64"],
-                    "min_glibc": ""
-                }
-            }, f, indent=2, ensure_ascii=False)
 
-    # gameinfo.xml
-    gameinfo = os.path.join(pdir, "portmaster", "gameinfo.xml")
-    if not os.path.exists(gameinfo):
-        with open(gameinfo, "w", encoding="utf-8") as f:
-            f.write('''<?xml version="1.0" encoding="utf-8"?>
-<gameList>
-  <game>
-    <path>./{title}.sh</path>
-    <name>{title}</name>
-    <desc>Port de {title} para PortMaster.</desc>
-    <developer>Samuka</developer>
-    <publisher>Open Source</publisher>
-    <genre>{genre}</genre>
-  </game>
-</gameList>
-'''.format(title=args.title, genre=args.genre.capitalize()))
+def copy_tree(source: Path, dest: Path, values: dict) -> None:
+    for item in source.iterdir():
+        target = dest / item.name
+        if item.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+            copy_tree(item, target, values)
+        else:
+            write(target, render(item.read_text(encoding="utf-8"), values))
 
-    # launcher .sh (simplificado, modelo CaVo)
-    sh = os.path.join(pdir, args.title.replace(" ", "") + ".sh")
-    if not os.path.exists(sh):
-        with open(sh, "w", encoding="utf-8", newline="\n") as f:
-            f.write('''#!/bin/bash
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-GAMEDIR="$SCRIPT_DIR/{pid}"
-cd "$GAMEDIR" || exit 1
-export PYTHONPATH="$GAMEDIR:$GAMEDIR/core:${{PYTHONPATH:-}}"
-python3 "$GAMEDIR/main.py"
-'''.format(pid=pid))
 
-    # requirements.txt (dependências Python do app)
-    reqs = os.path.join(pdir, "requirements.txt")
-    if not os.path.exists(reqs):
-        with open(reqs, "w", encoding="utf-8") as f:
-            f.write("# Dependencias Python do port (aarch64 / cp311).\\n")
-            f.write("requests>=2.31\\n")
-            f.write("# beautifulsoup4>=4.12   # scraping HTML\\n")
-            f.write("# pillow>=10.0           # imagens\\n")
+def register(app_id: str, title: str, desc: str) -> None:
+    """Inclui o port novo no registro da colecao."""
+    if not REGISTRY.exists():
+        return
+    data = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    apps = data.setdefault("apps", [])
+    if any(app.get("id") == app_id for app in apps):
+        return
+    priority = max((int(app.get("priority", 0)) for app in apps), default=0) + 1
+    apps.append(
+        {
+            "id": app_id,
+            "name": title,
+            "type": "app",
+            "approach": "protocolo/api",
+            "status": "planejado",
+            "priority": priority,
+        }
+    )
+    apps.sort(key=lambda app: int(app.get("priority", 0)), reverse=True)
+    REGISTRY.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    # fetch_deps.py (modelo do port de ref)
-    fetch = os.path.join(pdir, "fetch_deps.py")
-    if not os.path.exists(fetch):
-        with open(fetch, "w", encoding="utf-8") as f:
-            f.write('''"""Baixa dependencias para o dispositivo (aarch64/cp311)."""
-import subprocess, sys, os
-HERE = os.path.dirname(os.path.abspath(__file__))
-REQ = os.path.join(HERE, "requirements.txt")
-OUT = os.path.join(HERE, "site-packages")
-os.makedirs(OUT, exist_ok=True)
-print("Instalando deps de", REQ, "em", OUT)
-# Ajuste o index/plataforma conforme o dispositivo alvo.
-subprocess.run([sys.executable, "-m", "pip", "install", "-r", REQ,
-                "--target", OUT, "--upgrade"], check=False)
-print("Pronto. Copie site-packages/ para o dispositivo.")
-''')
 
-    # README
-    readme = os.path.join(pdir, "README.md")
-    if not os.path.exists(readme):
-        with open(readme, "w", encoding="utf-8") as f:
-            f.write("# " + args.title + "\n\nPort gerado por tools/new_port.py.\n")
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("id", help="id do port (pasta e registro)")
+    parser.add_argument("title", help="titulo mostrado no PortMaster")
+    parser.add_argument("--package", default="", help="nome do pacote python (padrao: o id)")
+    parser.add_argument("--genre", default="other", choices=sorted(GENRE_TITLES))
+    parser.add_argument("--desc", default="", help="descricao curta do port")
+    parser.add_argument("--no-register", action="store_true", help="nao mexe no registro")
+    args = parser.parse_args(argv)
 
-    print("Port criado em", pdir)
+    app_id = re.sub(r"[^a-z0-9]+", "-", args.id.lower()).strip("-")
+    title = args.title
+    package = args.package or app_id.replace("-", "_")
+    script = f"{title}.sh"
+    class_name = re.sub(r"[^A-Za-z0-9]+", "", title) + "App"
+    desc = args.desc or f"Port {title} para PortMaster."
+    values = {
+        "ID": app_id,
+        "ID_UPPER": app_id.upper().replace("-", "_"),
+        "TITLE": title,
+        "SCRIPT": script,
+        "PACKAGE": package,
+        "CLASS": class_name,
+        "GENRE": args.genre,
+        "GENRE_TITLE": GENRE_TITLES.get(args.genre, "Other"),
+        "DESC": desc,
+        "DATE": datetime.date.today().strftime("%Y%m%d"),
+        "URL": "https://github.com/Samukiniaco/oddhub",
+    }
+
+    dest = PORTS / app_id
+    if dest.exists():
+        print(f"O port {app_id} ja existe em {dest}")
+        return 1
+    dest.mkdir(parents=True)
+
+    # metadados do port (layout de PR: do lado do .sh)
+    for name in METADATA:
+        write(dest / name, render((TEMPLATE / name).read_text(encoding="utf-8"), values))
+
+    # launcher
+    write(dest / script, render((TEMPLATE / "template.sh").read_text(encoding="utf-8"), values))
+
+    # pasta do jogo (o core entra depois, com tools/sync_core.py)
+    game = dest / app_id
+    copy_tree(TEMPLATE / "template", game, values)
+    (game / "template.ini").rename(game / f"{app_id}.ini")
+    (game / "template").rename(game / package)
+    (game / "licenses" / "LICENSE-template.txt").rename(game / "licenses" / f"LICENSE-{app_id}.txt")
+
+    if not args.no_register:
+        register(app_id, title, desc)
+
+    print(f"Port criado em {dest}")
+    print(f"  script:      {script}")
+    print(f"  pasta jogo:  {app_id}/")
+    print(f"  pacote:      {app_id}/{package}/")
+    print(f"  proximo:     python tools/sync_core.py {app_id}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

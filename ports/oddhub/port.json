@@ -1,0 +1,33 @@
+{
+  "version": 4,
+  "name": "oddhub.zip",
+  "items": [
+    "OddHub.sh",
+    "oddhub"
+  ],
+  "items_opt": [],
+  "attr": {
+    "title": "OddHub",
+    "porter": [
+      "Samuka"
+    ],
+    "desc": "Gerenciador da colecao OddHub: mostra os ports instalados no aparelho e abre o escolhido.",
+    "desc_md": null,
+    "inst": "Pronto para rodar. Os ports da colecao aparecem automaticamente quando estao instalados.",
+    "inst_md": null,
+    "genres": [
+      "other"
+    ],
+    "image": null,
+    "rtr": false,
+    "exp": false,
+    "runtime": [
+      "python_3.11"
+    ],
+    "store": [],
+    "availability": "full",
+    "reqs": [],
+    "arch": [],
+    "min_glibc": ""
+  }
+}
