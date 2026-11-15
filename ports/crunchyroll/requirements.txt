@@ -1,1 +1,0 @@
-# Dependencias Python do port (aarch64 / cp311).\nrequests>=2.31\n# beautifulsoup4>=4.12   # scraping HTML\n# pillow>=10.0           # imagens\n

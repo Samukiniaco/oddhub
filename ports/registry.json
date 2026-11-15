@@ -10,10 +10,10 @@
   "apps": [
     {
       "id": "gmail",
-      "name": "PortMail",
+      "name": "Gmail",
       "type": "mail",
-      "approach": "api",
-      "status": "planejado",
+      "approach": "imap/smtp",
+      "status": "em teste",
       "priority": 4
     },
     {

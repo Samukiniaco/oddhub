@@ -9,6 +9,7 @@ dist/
 *.zip
 
 # Port runtime/deps pesados
+port de ref/
 port de ref/cavo/site-packages/
 port de ref/cavo/deps/
 port de ref/cavo/libs.aarch64/

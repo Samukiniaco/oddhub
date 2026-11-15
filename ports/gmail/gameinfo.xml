@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./Gmail.sh</path>
+    <name>Gmail</name>
+    <desc>Cliente de email IMAP/SMTP para PortMaster. Le, responde e envia mensagens da sua propria conta, em tela cheia e com controle.</desc>
+    <releasedate>20261115T000000</releasedate>
+    <developer>Samuka</developer>
+    <publisher>Open Source</publisher>
+    <genre>Utility</genre>
+    <image>./gmail/screenshot.png</image>
+  </game>
+</gameList>
